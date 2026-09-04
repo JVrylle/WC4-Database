@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Conqueror 4 Elite Force Database</title>
+<link rel="icon" type="image/png" href="media/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=18">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar__left"><div class="topbar__brand">
+    <div class="topbar__mark topbar__mark--logo"><img src="media/logo.png" alt="WC4 logo"></div>
+    <div class="topbar__title"><h1>World Conqueror 4</h1><p>Elite Force Database</p></div>
+  </div></div>
+  <nav class="pagenav" aria-label="Site navigation">
+    <a href="index.html"><img class="navicon" src="media/home.png" alt="">Home</a>
+    <a href="generals.html"><img class="navicon" src="media/military-hat.png" alt="">Generals</a>
+    <a href="elite.html" class="pagenav--active"><img class="navicon" src="media/star.png" alt="">Elite Forces</a>
+    <a href="skills.html"><img class="navicon" src="media/crown.png" alt="">Skills</a>
+    <a href="calculator.html"><img class="navicon" src="media/calculator.png" alt="">Calculator</a>
+  </nav>
+  <div id="statusLight" class="topbar__status status--idle"><span class="status-dot"></span><span class="status-text">STANDBY</span></div>
+</header>
+<main class="console">
+  <div class="side-panel">
+    <aside class="log-panel" aria-label="General information">
+      <div class="log-panel__header"><img class="hicon" src="media/promotion.png" alt=""><h2>General Information</h2></div>
+      <ul class="log-list log-list--timeline">
+      <li class="log-item"><span class="log-item__date">Max-tech stats</span>Every level shows attack, defense, movement, HP and range with maximum technology applied.</li>
+      <li class="log-item"><span class="log-item__date">Level slider</span>Drag 1–12 to inspect stats, upgrade costs and skills at each stage.</li>
+      <li class="log-item"><span class="log-item__date">Tech toggle</span>Switch between max-tech and base attack values used by the damage formula.</li>
+      </ul>
+    </aside>
+    <div class="log-panel links-panel" aria-label="Related WC4 tools">
+      <div class="log-panel__header"><img class="hicon" src="media/layer.png" alt=""><h2>Other Systems:</h2></div>
+      <div class="links-panel__body">
+        <a class="sister-link" href="generals.html"><span class="sister-link__name">WC4 Generals Database</span><span class="sister-link__url">Browse and search all WC4 Generals and their skills.</span></a>
+        <a class="sister-link" href="calculator.html"><span class="sister-link__name">WC4 Damage Calculator</span><span class="sister-link__url">Compare damage between setups. Coming soon.</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="console__main">
+    <section class="search-card" aria-label="Unit name search">
+      <div class="field"><label for="efSearch">Search Unit</label>
+        <div class="combo__wrap">
+          <svg class="combo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="efSearch" type="text" placeholder="Type a unit name…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="efSearchList">
+          <ul id="efSearchList" class="combo__list" role="listbox" hidden></ul>
+        </div>
+      </div>
+    </section>
+    <section class="type-filter" id="typeFilter" aria-label="Unit type filter"></section>
+    <section class="query-panel" aria-label="Unit query">
+      <div class="field"><label for="efSelect">Unit</label>
+        <div class="select-wrap">
+          <img id="unitTypeIcon" src="media/tank.png" alt="">
+          <select id="efSelect"></select>
+        </div>
+      </div>
+      <div class="field field--slider"><label for="levelSlider">Level</label>
+        <div class="slider-wrapper">
+          <button id="levelDown" class="level-btn" type="button" aria-label="Previous level">−</button>
+          <input id="levelSlider" type="range" min="1" max="12" step="1" value="12" aria-label="Select unit level">
+          <input id="levelInput" class="level-input" type="number" min="1" max="12" step="1" value="12" aria-label="Level number">
+          <button id="levelUp" class="level-btn" type="button" aria-label="Next level">+</button>
+        </div>
+      </div>
+      <div class="field field--toggle"><label for="techToggle"><img src="media/gear.png" alt="">Tech Upgrades</label>
+        <button id="techToggle" class="tech-toggle" type="button" aria-pressed="true"><img src="media/atomic.png" alt=""><span>Max Tech Upgrades</span></button>
+      </div>
+    </section>
+    <section id="resultPanel" class="result-panel" aria-live="polite"><div class="result-empty"><p>Loading unit database…</p></div></section>
+  </div>
+</main>
+<a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
+<footer class="footer"><p>WC4 Community Database</p></footer>
+<script src="js/data_eliteforce.js?v=18"></script>
+<script src="js/data_feat_icons.js?v=18"></script>
+<script src="js/data_portraits.js?v=18"></script>
+<script src="js/app.js?v=18"></script>
+<script>
+const UNIT_TYPES = ['infantry', 'artillery', 'navy', 'armored', 'airforce'];
+const TYPE_LABELS = { infantry: 'Infantry', artillery: 'Artillery', navy: 'Navy', armored: 'Armored', airforce: 'Air Force' };
+const TECH_ATTACK_BONUS = { infantry: 9, armored: 15, artillery: 18, navy: 16, airforce: 16 };
+const SW = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const TYPE_ICONS = {
+  infantry: '<img class="ticon" src="media/soldier.png" alt="">',
+  artillery: '<img class="ticon" src="media/artillery.png" alt="">',
+  navy: '<img class="ticon" src="media/ship.png" alt="">',
+  armored: '<img class="ticon" src="media/tank.png" alt="">',
+  airforce: '<img class="ticon" src="media/air.png" alt="">'
+};
+const STAT_META = {
+  attack: { label: 'Attack', cls: 'stat--attack', icon: '<img class="sicon" src="media/attack.png" alt="">' },
+  defense: { label: 'Defense', cls: 'stat--defense', icon: '<img class="sicon" src="media/defence.png" alt="">' },
+  movement: { label: 'Movement', cls: 'stat--movement', icon: '<img class="sicon" src="media/boots.png" alt="">' },
+  hp: { label: 'HP', cls: 'stat--hp', icon: '<img class="sicon" src="media/heart.png" alt="">' },
+  range: { label: 'Range', cls: 'stat--range', icon: '<img class="sicon" src="media/target.png" alt="">' }
+};
+const TANK_SVG = '<img class="tank" src="media/tank.png" alt="No image">';
+function normType(t) {
+  t = (t || '').toLowerCase();
+  if (t.includes('inf')) return 'infantry';
+  if (t.includes('armor') || t.includes('armour')) return 'armored';
+  if (t.includes('art')) return 'artillery';
+  if (t.includes('nav') || t.includes('sea')) return 'navy';
+  return 'airforce';
+}
+const TYPE_IMG = { infantry: 'media/soldier.png', artillery: 'media/artillery.png', navy: 'media/ship.png', armored: 'media/tank.png', airforce: 'media/air.png' };
+function typeImg(type, cls) {
+  return `<img class="${cls || 'ticon'}" src="${TYPE_IMG[type] || TYPE_IMG.airforce}" alt="">`;
+}
+let selectedType = 'armored', techOn = true, activeIdx = -1, matches = [];
+const efSearch = document.getElementById('efSearch'), efSearchList = document.getElementById('efSearchList');
+const efSelect = document.getElementById('efSelect'), resultPanel = document.getElementById('resultPanel');
+const slider = document.getElementById('levelSlider'), levelInput = document.getElementById('levelInput');
+const levelDown = document.getElementById('levelDown'), levelUp = document.getElementById('levelUp');
+const techToggle = document.getElementById('techToggle'), statusLight = document.getElementById('statusLight');
+function setStatus(s, t) { statusLight.className = 'topbar__status status--' + s; statusLight.innerHTML = '<span class="status-dot"></span><span class="status-text">' + t + '</span>'; }
+function unitImg(name) {
+  const src = WC4_PORTRAITS.elite[name];
+  if (src) return `<img class="unit-photo" src="${src}" alt="${escapeHtml(name)}" onerror="this.outerHTML=window.__tankPH()">`;
+  return window.__tankPH();
+}
+window.__tankPH = function () { return `<div class="unit-photo--missing" role="img" aria-label="No image">${TANK_SVG}</div>`; };
+function statRow(key, val, max) {
+  const m = STAT_META[key], pct = Math.max(3, Math.round((val / Math.max(max, 1)) * 100));
+  return `<div class="stat-row ${m.cls}"><div class="stat-row__icon">${m.icon}</div><div class="stat-row__label">${m.label}</div><div class="stat-row__bar"><div class="stat-row__fill" style="width:${pct}%"></div></div><div class="stat-row__value">${val} / ${max}</div></div>`;
+}
+function skillBox(s) {
+  const tier = ['bronze', 'silver', 'gold', 'platinum'].includes((s.tier || '').toLowerCase()) ? s.tier.toLowerCase() : 'gold';
+  const per = (typeof WC4_FEAT_ICONS !== 'undefined' ? WC4_FEAT_ICONS : {})[s.title] || {};
+  const file = per[tier] || Object.values(per)[0];
+  const img = file ? `<img src="media/feats/${file}" alt="" onerror="this.remove()">` : '';
+  return `<div class="efskill" tabindex="0">${img}<span class="efskill__title">${escapeHtml(s.title)}</span>${s.description ? `<div class="tip"><b>${escapeHtml(s.title)}</b><p>${escapeHtml(s.description)}</p></div>` : ''}</div>`;
+}
+function render(u, lv) {
+  const L = u.levels.find((x) => x.level === lv) || u.levels[u.levels.length - 1];
+  const type = normType(u.unit_type);
+  const fake = techOn ? 0 : (TECH_ATTACK_BONUS[type] || 0);
+  const stats = { ...L.stats, attack: Math.max(0, L.stats.attack - fake) };
+  const top = u.levels[u.levels.length - 1].stats;
+  const topAdj = { ...top, attack: Math.max(0, top.attack - fake) };
+  const di = document.getElementById('unitTypeIcon');
+  if (di) di.src = TYPE_IMG[type] || TYPE_IMG.airforce;
+  resultPanel.innerHTML = `<div class="dossier">
+    <div class="dossier__main">
+      <div class="unit-side">${unitImg(u.name)}
+        <div class="unit-meta">
+          <div class="unit-meta__row"><img src="media/star.png" alt="">TYPE</div>
+          <span class="unit-meta__val">${escapeHtml(u.unit_type)}</span>
+        </div>
+      </div>
+      <div>
+        <div class="dossier__head">
+          <div><div class="dossier__title">
+            ${typeImg(type, 'utype')}
+            <h2>${escapeHtml(u.name)}</h2><span class="badge">LVL ${L.level}</span>
+          </div><div class="dossier__sub">${escapeHtml(u.unit_type)} Unit</div></div>
+          <button class="compare-btn" id="maxBtn" type="button"><img src="media/graph-bar.png" alt="">Compare Max Stats</button>
+        </div>
+        <div class="stat-grid">
+          ${statRow('attack', stats.attack, topAdj.attack)}${statRow('defense', stats.defense, top.defense)}
+          ${statRow('movement', stats.movement, top.movement)}${statRow('hp', stats.hp, top.hp)}${statRow('range', stats.range, top.range)}
+        </div>
+        <div class="skills"><h3>Skills</h3><div class="efskills">
+          ${L.skills.map(skillBox).join('') || '<p class="skill-empty">No skills at this level.</p>'}
+        </div></div>
+      </div>
+    </div></div>`;
+  document.getElementById('maxBtn').addEventListener('click', () => setLevel(12));
+  setStatus('ready', 'RECORD FOUND');
+}
+function curLevel() { return Math.max(1, Math.min(12, parseInt(slider.value, 10) || 1)); }
+function setLevel(n) {
+  n = Math.max(1, Math.min(12, n));
+  slider.value = n; levelInput.value = n;
+  levelDown.disabled = n <= 1; levelUp.disabled = n >= 12;
+  const u = WC4_ELITE.find((x) => x.name === efSelect.value);
+  if (u) render(u, n);
+}
+function refreshMatches() {
+  const q = efSearch.value.trim().toLowerCase();
+  matches = WC4_ELITE.filter((u) => (!q || u.name.toLowerCase().includes(q)));
+  if (activeIdx > matches.length - 1) activeIdx = -1;
+  efSearchList.innerHTML = matches.slice(0, 60).map((u, i) =>
+    `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(u.name)}</li>`).join('');
+  efSearchList.querySelectorAll('.combo__item').forEach((el) =>
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); pick(Number(el.dataset.i)); }));
+}
+function pick(i) {
+  const u = matches[i];
+  if (!u) return;
+  efSearch.value = u.name;
+  efSearchList.hidden = true;
+  applyType(normType(u.unit_type));
+  efSelect.value = u.name;
+  render(u, curLevel());
+}
+function applyType(t) {
+  selectedType = t;
+  document.querySelectorAll('#typeFilter .type-btn').forEach((b) => b.classList.toggle('type-btn--active', b.dataset.type === t));
+  const list = WC4_ELITE.filter((u) => normType(u.unit_type) === t);
+  efSelect.innerHTML = list.map((u) => `<option value="${escapeHtml(u.name)}">${escapeHtml(u.name)}</option>`).join('');
+  const u = list[0];
+  if (u) { efSearch.value = u.name; render(u, curLevel()); }
+}
+document.getElementById('typeFilter').innerHTML = UNIT_TYPES.map((t) =>
+  `<button type="button" class="type-btn${t === selectedType ? ' type-btn--active' : ''}" data-type="${t}">${TYPE_ICONS[t]}${TYPE_LABELS[t]}</button>`).join('');
+document.querySelectorAll('#typeFilter .type-btn').forEach((b) => b.addEventListener('click', () => applyType(b.dataset.type)));
+efSelect.addEventListener('change', () => { const u = WC4_ELITE.find((x) => x.name === efSelect.value); if (u) { efSearch.value = u.name; render(u, curLevel()); } });
+slider.addEventListener('input', () => { levelInput.value = slider.value; levelDown.disabled = +slider.value <= 1; levelUp.disabled = +slider.value >= 12; const u = WC4_ELITE.find((x) => x.name === efSelect.value); if (u) render(u, curLevel()); });
+levelDown.addEventListener('click', () => setLevel(curLevel() - 1));
+levelUp.addEventListener('click', () => setLevel(curLevel() + 1));
+levelInput.addEventListener('change', () => setLevel(parseInt(levelInput.value, 10) || 1));
+techToggle.addEventListener('click', () => {
+  techOn = !techOn;
+  techToggle.querySelector('span').textContent = techOn ? 'Max Tech Upgrades' : 'No Tech Upgrades';
+  techToggle.setAttribute('aria-pressed', String(techOn));
+  const u = WC4_ELITE.find((x) => x.name === efSelect.value);
+  if (u) render(u, curLevel());
+});
+efSearch.addEventListener('input', () => { activeIdx = -1; refreshMatches(); efSearchList.hidden = matches.length === 0; });
+efSearch.addEventListener('focus', () => { refreshMatches(); if (matches.length) efSearchList.hidden = false; });
+efSearch.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!matches.length) return;
+    const n = Math.min(matches.length, 60);
+    activeIdx = e.key === 'ArrowDown' ? (activeIdx + 1) % n : (activeIdx - 1 + n) % n;
+    refreshMatches();
+  } else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pick(activeIdx); }
+  else if (e.key === 'Escape') { efSearchList.hidden = true; }
+});
+efSearch.addEventListener('blur', () => { efSearchList.hidden = true; });
+setStatus('busy', 'LOADING');
+applyType('armored');
+const first = WC4_ELITE.find((u) => u.name === 'A41 Centurion') || WC4_ELITE[0];
+if (first) { applyType(normType(first.unit_type)); efSelect.value = first.name; efSearch.value = first.name; setLevel(1); }
+</script>
+</body>
+</html>

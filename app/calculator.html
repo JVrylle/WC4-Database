@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>World Conqueror 4 Damage Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+/>
+<link rel="icon" type="image/png" href="media/logo.png">
+<link rel="stylesheet" href="css/calc.css?v=18" />
+</head>
+<body>
+
+  <header class="topbar">
+  <div class="topbar__left"><div class="topbar__brand">
+    <div class="topbar__mark topbar__mark--logo"><img src="media/logo.png" alt="WC4 logo"></div>
+    <div class="topbar__title"><h1>World Conqueror 4</h1><p>Damage Calculator</p></div>
+  </div></div>
+  <nav class="pagenav" aria-label="Site navigation">
+    <a href="index.html"><img class="navicon" src="media/home.png" alt="">Home</a>
+    <a href="generals.html"><img class="navicon" src="media/military-hat.png" alt="">Generals</a>
+    <a href="elite.html"><img class="navicon" src="media/star.png" alt="">Elite Forces</a>
+    <a href="skills.html"><img class="navicon" src="media/crown.png" alt="">Skills</a>
+    <a href="calculator.html" class="pagenav--active"><img class="navicon" src="media/calculator.png" alt="">Calculator</a>
+  </nav>
+  <div id="statusLight" class="topbar__status status--idle" aria-live="polite"><span class="status-dot"></span><span class="status-text">STANDBY</span></div>
+</header>
+
+  <main class="console">
+
+    <section class="vs-grid" aria-label="Combatant selection">
+
+      <div class="side-panel" id="leftPanel">
+        <div class="side-panel__header">
+          <h2>A</h2>
+        </div>
+        <div class="side-panel__body">
+          <div class="field">
+            <label for="leftGenSelect">General</label>
+            <select id="leftGenSelect"></select>
+          </div>
+          <div class="field">
+            <label for="leftEfSelect">Elite Force</label>
+            <select id="leftEfSelect"></select>
+          </div>
+          <div class="field field--slider">
+            <label for="leftLevelSlider">EF Level</label>
+            <div class="slider-wrapper">
+              <button id="leftLevelDown" class="level-btn" type="button" aria-label="Previous level">&#8722;</button>
+              <input id="leftLevelSlider" type="range" min="1" max="12" step="1" value="1" aria-label="Select EF level" />
+              <input id="leftLevelInput" class="level-input" type="number" min="1" max="12" step="1" value="1" aria-label="EF level number" />
+              <button id="leftLevelUp" class="level-btn" type="button" aria-label="Next level">&#43;</button>
+            </div>
+          </div>
+          <details class="formula-inputs">
+            <summary>Formula Inputs</summary>
+            <div class="formula-grid">
+              <div class="mini-field">
+                <label for="leftMorale">morale_multiplier &times;</label>
+                <input id="leftMorale" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="leftCrit">crit_multiplier &times;</label>
+                <input id="leftCrit" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="leftHealth">health_multiplier &times;</label>
+                <input id="leftHealth" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="leftFakeAtk">all_fake_attack +</label>
+                <input id="leftFakeAtk" type="number" step="any" placeholder="0" />
+              </div>
+              <div class="mini-field">
+                <label for="leftDmgInc">dmg_increase_multipliers &times;</label>
+                <input id="leftDmgInc" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="leftDmgRed">dmg_reduction_multipliers &times;</label>
+                <input id="leftDmgRed" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="leftFlatDmg">flat_dmg +</label>
+                <input id="leftFlatDmg" type="number" step="any" placeholder="0" />
+              </div>
+              <div class="mini-field">
+                <label for="leftEffAtkOvr">eff_atk override</label>
+                <input id="leftEffAtkOvr" type="number" step="any" placeholder="62.5" />
+              </div>
+            </div>
+          </details>
+          <details class="basic-modifiers">
+            <summary>Basic Modifiers</summary>
+            <div class="basic-grid">
+              <div class="mini-field">
+                <label>Morale</label>
+                <div id="leftMoraleBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Terrain</label>
+                <div id="leftTerrainBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Red Ribbon</label>
+                <div id="leftRibbonBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Crit Mode</label>
+                <div id="leftCritBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>General Title</label>
+                <div id="leftTitleBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field mini-field--full">
+                <label for="leftHpSlider">Unit HP %</label>
+                <div class="slider-wrapper">
+                  <input id="leftHpSlider" type="range" min="0" max="100" step="1" value="100" aria-label="Select HP percent" />
+                  <input id="leftHpInput" class="level-input" type="number" min="0" max="100" step="1" value="100" aria-label="HP percent number" />
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="vs-divider" aria-hidden="true">
+        <span>VS</span>
+      </div>
+
+      <div class="side-panel" id="rightPanel">
+        <div class="side-panel__header">
+          <h2>B</h2>
+        </div>
+        <div class="side-panel__body">
+          <div class="field">
+            <label for="rightGenSelect">General</label>
+            <select id="rightGenSelect"></select>
+          </div>
+          <div class="field">
+            <label for="rightEfSelect">Elite Force</label>
+            <select id="rightEfSelect"></select>
+          </div>
+          <div class="field field--slider">
+            <label for="rightLevelSlider">EF Level</label>
+            <div class="slider-wrapper">
+              <button id="rightLevelDown" class="level-btn" type="button" aria-label="Previous level">&#8722;</button>
+              <input id="rightLevelSlider" type="range" min="1" max="12" step="1" value="1" aria-label="Select EF level" />
+              <input id="rightLevelInput" class="level-input" type="number" min="1" max="12" step="1" value="1" aria-label="EF level number" />
+              <button id="rightLevelUp" class="level-btn" type="button" aria-label="Next level">&#43;</button>
+            </div>
+          </div>
+          <details class="formula-inputs">
+            <summary>Formula Inputs</summary>
+            <div class="formula-grid">
+              <div class="mini-field">
+                <label for="rightMorale">morale_multiplier &times;</label>
+                <input id="rightMorale" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="rightCrit">crit_multiplier &times;</label>
+                <input id="rightCrit" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="rightHealth">health_multiplier &times;</label>
+                <input id="rightHealth" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="rightFakeAtk">all_fake_attack +</label>
+                <input id="rightFakeAtk" type="number" step="any" placeholder="0" />
+              </div>
+              <div class="mini-field">
+                <label for="rightDmgInc">dmg_increase_multipliers &times;</label>
+                <input id="rightDmgInc" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="rightDmgRed">dmg_reduction_multipliers &times;</label>
+                <input id="rightDmgRed" type="number" step="any" placeholder="1" />
+              </div>
+              <div class="mini-field">
+                <label for="rightFlatDmg">flat_dmg +</label>
+                <input id="rightFlatDmg" type="number" step="any" placeholder="0" />
+              </div>
+              <div class="mini-field">
+                <label for="rightEffAtkOvr">eff_atk override</label>
+                <input id="rightEffAtkOvr" type="number" step="any" placeholder="62.5" />
+              </div>
+            </div>
+          </details>
+          <details class="basic-modifiers">
+            <summary>Basic Modifiers</summary>
+            <div class="basic-grid">
+              <div class="mini-field">
+                <label>Morale</label>
+                <div id="rightMoraleBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Terrain</label>
+                <div id="rightTerrainBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Red Ribbon</label>
+                <div id="rightRibbonBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Crit Mode</label>
+                <div id="rightCritBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>General Title</label>
+                <div id="rightTitleBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field mini-field--full">
+                <label for="rightHpSlider">Unit HP %</label>
+                <div class="slider-wrapper">
+                  <input id="rightHpSlider" type="range" min="0" max="100" step="1" value="100" aria-label="Select HP percent" />
+                  <input id="rightHpInput" class="level-input" type="number" min="0" max="100" step="1" value="100" aria-label="HP percent number" />
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="enemy-card" aria-label="Enemy target selection">
+      <div class="side-panel side-panel--enemy">
+        <div class="side-panel__header">
+          <h2>Enemy (Target)</h2>
+        </div>
+        <div class="side-panel__body">
+          <div class="field">
+            <label for="enemyEfSelect">Enemy EF</label>
+            <select id="enemyEfSelect"></select>
+          </div>
+          <div class="field field--slider">
+            <label for="enemyLevelSlider">EF Level</label>
+            <div class="slider-wrapper">
+              <button id="enemyLevelDown" class="level-btn" type="button" aria-label="Previous level">&#8722;</button>
+              <input id="enemyLevelSlider" type="range" min="1" max="12" step="1" value="1" aria-label="Select EF level" />
+              <input id="enemyLevelInput" class="level-input" type="number" min="1" max="12" step="1" value="1" aria-label="EF level number" />
+              <button id="enemyLevelUp" class="level-btn" type="button" aria-label="Next level">&#43;</button>
+            </div>
+          </div>
+          <details class="basic-modifiers">
+            <summary>Basic Modifiers</summary>
+            <div class="basic-grid">
+              <div class="mini-field">
+                <label>Morale</label>
+                <div id="enemyMoraleBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Terrain</label>
+                <div id="enemyTerrainBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Blue Ribbon</label>
+                <div id="enemyRibbonBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field">
+                <label>Crit Mode</label>
+                <div id="enemyCritBtns" class="seg-btns"></div>
+              </div>
+              <div class="mini-field mini-field--full">
+                <label for="enemyHpSlider">Unit HP %</label>
+                <div class="slider-wrapper">
+                  <input id="enemyHpSlider" type="range" min="0" max="100" step="1" value="100" aria-label="Select HP percent" />
+                  <input id="enemyHpInput" class="level-input" type="number" min="0" max="100" step="1" value="100" aria-label="HP percent number" />
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="action-row">
+      <button id="compareBtn" class="compare-btn" type="button" disabled>Compare</button>
+    </section>
+
+    <section id="resultPanel" class="result-panel" aria-live="polite">
+      <div class="result-empty">
+        <p>Select a general and an elite force unit for each side, then press Compare.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
+
+  <footer class="footer"><p>WC4 Community Database</p></footer>
+
+<script src="js/data_generals.js?v=18"></script>
+<script src="js/data_eliteforce.js?v=18"></script>
+<script src="js/data_skills.js?v=18"></script>
+<script src="js/data_portraits.js?v=18"></script>
+<script src="js/data_skill_icons.js?v=18"></script>
+<script src="js/data_feat_icons.js?v=18"></script>
+<script src="js/calc_pools.js?v=18"></script>
+<script src="js/app.js?v=18"></script>
+<script src="js/calc.js?v=18"></script>
+</body>
+</html>

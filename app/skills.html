@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Conqueror 4 Skills Database</title>
+<link rel="icon" type="image/png" href="media/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=18">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar__left"><div class="topbar__brand">
+    <div class="topbar__mark topbar__mark--logo"><img src="media/logo.png" alt="WC4 logo"></div>
+    <div class="topbar__title"><h1>World Conqueror 4</h1><p>Skills Database</p></div>
+  </div></div>
+  <nav class="pagenav" aria-label="Site navigation">
+    <a href="index.html"><img class="navicon" src="media/home.png" alt="">Home</a>
+    <a href="generals.html"><img class="navicon" src="media/military-hat.png" alt="">Generals</a>
+    <a href="elite.html"><img class="navicon" src="media/star.png" alt="">Elite Forces</a>
+    <a href="skills.html" class="pagenav--active"><img class="navicon" src="media/crown.png" alt="">Skills</a>
+    <a href="calculator.html"><img class="navicon" src="media/calculator.png" alt="">Calculator</a>
+  </nav>
+  <div id="statusLight" class="topbar__status status--idle"><span class="status-dot"></span><span class="status-text">STANDBY</span></div>
+</header>
+<main class="console">
+  <div class="side-panel">
+    <aside class="log-panel" aria-label="General information">
+      <div class="log-panel__header"><img class="hicon" src="media/promotion.png" alt=""><h2>General Information</h2></div>
+      <ul class="log-list log-list--timeline">
+      <li class="log-item"><span class="log-item__date">Kinds</span>Filter General or Elite Force skills from the pills or the Type list.</li>
+      <li class="log-item"><span class="log-item__date">Levels</span>Move the slider through levels or tiers; the icon updates per tier.</li>
+      <li class="log-item"><span class="log-item__date">Numbers</span>Key values are highlighted inside each description.</li>
+      </ul>
+    </aside>
+    <div class="log-panel links-panel" aria-label="Related WC4 tools">
+      <div class="log-panel__header"><img class="hicon" src="media/layer.png" alt=""><h2>Other Systems:</h2></div>
+      <div class="links-panel__body">
+        <a class="sister-link" href="generals.html"><span class="sister-link__name">WC4 Generals Database</span><span class="sister-link__url">Browse and search all WC4 Generals and their skills.</span></a>
+        <a class="sister-link" href="elite.html"><span class="sister-link__name">WC4 Elite Force Database</span><span class="sister-link__url">Browse all 50 elite forces with per-level stats.</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="console__main">
+    <section class="search-card" aria-label="Skill search">
+      <div class="field"><label for="skSearch">Search Skill</label>
+        <div class="combo__wrap">
+          <svg class="combo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="skSearch" type="text" placeholder="Type a skill name…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="skSearchList">
+          <button class="combo__clear" id="skClear" type="button" aria-label="Clear search" hidden>×</button>
+          <ul id="skSearchList" class="combo__list" role="listbox" hidden></ul>
+        </div>
+      </div>
+    </section>
+    <section class="type-filter" id="kindFilter" aria-label="Skill kind filter"></section>
+    <section class="query-panel" aria-label="Skill query">
+      <div class="field"><label for="skType">Type</label>
+        <select id="skType">
+          <option value="all">All</option>
+          <option value="general">General</option>
+          <option value="elite">Elite</option>
+        </select>
+      </div>
+      <div class="field field--slider" id="levelField"><label for="levelSlider">Level / Tier</label>
+        <div class="slider-wrapper">
+          <button id="levelDown" class="level-btn" type="button" aria-label="Previous level">−</button>
+          <input id="levelSlider" type="range" min="1" max="5" step="1" value="1" aria-label="Select skill level">
+          <button id="levelUp" class="level-btn" type="button" aria-label="Next level">+</button>
+        </div>
+      </div>
+    </section>
+    <section id="resultPanel" class="result-panel" aria-live="polite"><div class="result-empty"><p>Loading skills…</p></div></section>
+  </div>
+</main>
+<a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
+<footer class="footer"><p>WC4 Community Database</p></footer>
+<script src="js/data_skills.js?v=18"></script>
+<script src="js/data_skill_icons.js?v=18"></script>
+<script src="js/data_feat_icons.js?v=18"></script>
+<script src="js/app.js?v=18"></script>
+<script>
+const TIER_ORDER = ['bronze', 'silver', 'gold', 'platinum'];
+const items = [
+  ...WC4_SKILLS.general_skills.map((s) => ({ kind: 'general', title: s.title_en, ref: s, _q: (s.title_en + ' ' + s.name_cn).toLowerCase() })),
+  ...WC4_SKILLS.elite_skills.map((s) => ({ kind: 'elite', title: s.title, ref: s, _q: s.title.toLowerCase() }))
+];
+let kind = 'all', matches = [], activeIdx = -1, current = null;
+const skSearch = document.getElementById('skSearch'), skSearchList = document.getElementById('skSearchList');
+const skClear = document.getElementById('skClear'), skType = document.getElementById('skType');
+const resultPanel = document.getElementById('resultPanel');
+const slider = document.getElementById('levelSlider');
+const levelDown = document.getElementById('levelDown'), levelUp = document.getElementById('levelUp');
+const statusLight = document.getElementById('statusLight');
+function setStatus(s, t) { statusLight.className = 'topbar__status status--' + s; statusLight.innerHTML = '<span class="status-dot"></span><span class="status-text">' + t + '</span>'; }
+function stepsOf(item) { return item.kind === 'general' ? item.ref.levels.length : TIER_ORDER.filter((t) => item.ref.tiers[t]).length; }
+function labelOf(item, n) { return item.kind === 'general' ? 'LVL ' + item.ref.levels[n - 1].level : TIER_ORDER.filter((t) => item.ref.tiers[t])[n - 1].toUpperCase(); }
+function iconTile(item, tierKey) {
+  if (item.kind === 'general' && WC4_SKILL_ICONS[item.title] != null) {
+    return `<img src="media/skills/${WC4_SKILL_ICONS[item.title]}.webp" alt="" onerror="this.outerHTML=window.__skInit('${escapeHtml(item.title).replace(/'/g, "\\'")}')">`;
+  }
+  const per = (typeof WC4_FEAT_ICONS !== 'undefined' ? WC4_FEAT_ICONS : {})[item.title] || {};
+  const file = per[tierKey] || Object.values(per)[0];
+  if (item.kind === 'elite' && file) {
+    return `<img src="media/feats/${file}" alt="" onerror="this.outerHTML=window.__skInit('${escapeHtml(item.title).replace(/'/g, "\\'")}')">`;
+  }
+  return window.__skInit(item.title);
+}
+window.__skInit = function (t) { return `<div class="sk-tile__initial">${escapeHtml((t || '?').trim().charAt(0).toUpperCase())}</div>`; };
+function hilite(s) { return escapeHtml(s).replace(/(\d+%?)/g, '<b class="num">$1</b>'); }
+const TIER_COLORS = { bronze: '#8a5a2b', silver: '#6c7a88', gold: '#a0781c', platinum: '#3f8fc0' };
+function render(item, n) {
+  const isGen = item.kind === 'general';
+  const curTier = isGen ? null : TIER_ORDER.filter((t) => item.ref.tiers[t])[n - 1];
+  const tcolor = curTier ? (TIER_COLORS[curTier] || '#6c7a88') : null;
+  const badge = isGen ? '<span class="kind-badge kind-badge--general">General Skill</span>' : `<span class="kind-badge kind-badge--elite" style="background:${tcolor};">Elite Force Skill</span>`;
+  const pill = `<span class="badge"${tcolor ? ` style="background:${tcolor};border-color:${tcolor};color:#fff;"` : ''}>${labelOf(item, n)}</span>`;
+  let boxes = '';
+  if (isGen) {
+    const lv = item.ref.levels[n - 1];
+    boxes = `<div class="info-box"><span class="info-box__icon info-box__icon--gold"><img src="media/medals.png" alt=""></span><span class="info-box__label">Medals Cost</span><span class="info-box__value info-box__value--blue">${lv.cost_medal}</span></div>`;
+  } else {
+    boxes = '';
+  }
+  const desc = isGen ? item.ref.levels[n - 1].description_en : item.ref.tiers[TIER_ORDER.filter((t) => item.ref.tiers[t])[n - 1]];
+  const tierKey = isGen ? null : TIER_ORDER.filter((t) => item.ref.tiers[t])[n - 1];
+  resultPanel.innerHTML = `<div class="dossier"><div class="sk-dossier">
+    <div class="sk-left"><div class="sk-tile">${iconTile(item, tierKey)}</div>${badge}</div>
+    <div class="sk-right">
+      <div class="dossier__head"><div class="dossier__title"><h2>${escapeHtml(item.title)}</h2></div>${pill}</div>
+      <p class="sk-desc">${hilite(desc)}</p>
+      ${boxes ? `<div class="info-row">${boxes}</div>` : ''}
+      ${isGen ? '' : `<p class="tech-note">Example units: ${item.ref.example_units.map(escapeHtml).join(', ')}</p>`}
+    </div>
+  </div></div>`;
+  setStatus('ready', 'RECORD FOUND');
+}
+function setStep(n) {
+  const max = current ? stepsOf(current) : 1;
+  n = Math.max(1, Math.min(max, n));
+  slider.max = max; slider.value = n;
+  levelDown.disabled = n <= 1; levelUp.disabled = n >= max;
+  document.getElementById('levelField').hidden = max <= 1;
+  if (current) render(current, n);
+}
+function kindList() { return items.filter((s) => kind === 'all' || s.kind === kind); }
+function fillTypeSelect() {
+  const list = kindList();
+  skType.innerHTML = list.map((s, i) => `<option value="${i}">${escapeHtml(s.title)}</option>`).join('');
+}
+function syncKind(k, renderFirst = true) {
+  kind = k;
+  document.querySelectorAll('#kindFilter .type-btn').forEach((x) => x.classList.toggle('type-btn--active', x.dataset.k === k));
+  fillTypeSelect();
+  if (renderFirst) {
+    const list = kindList();
+    if (list.length) { current = list[0]; skSearch.value = current.title; updateClear(); skType.value = '0'; setStep(1); }
+  } else refreshList();
+}
+function filtered() {
+  const q = skSearch.value.trim().toLowerCase();
+  return items.filter((s) => (kind === 'all' || s.kind === kind) && (!q || s._q.includes(q)));
+}
+function refreshList() {
+  matches = filtered();
+  if (activeIdx > matches.length - 1) activeIdx = -1;
+  skSearchList.innerHTML = matches.slice(0, 60).map((s, i) =>
+    `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(s.title)}<small>&nbsp;· ${s.kind}</small></li>`).join('');
+  skSearchList.querySelectorAll('.combo__item').forEach((el) =>
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); pick(Number(el.dataset.i)); }));
+}
+function pick(i) {
+  const s = matches[i];
+  if (!s) return;
+  current = s;
+  skSearch.value = s.title;
+  updateClear();
+  skSearchList.hidden = true;
+  const ti = kindList().indexOf(s);
+  if (ti >= 0) skType.value = String(ti);
+  setStep(1);
+}
+function updateClear() { skClear.hidden = skSearch.value.trim() === ''; }
+document.getElementById('kindFilter').innerHTML =
+  [['all', 'All', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>'],
+   ['general', 'General Skills', '<img class="ticon" src="media/military-hat.png" alt="">'],
+   ['elite', 'Elite Force Skills', '<img class="ticon" src="media/star.png" alt="">']].map(([v, l, icon], i) =>
+    `<button type="button" class="type-btn${i === 0 ? ' type-btn--active' : ''}" data-k="${v}">${icon}${l}</button>`).join('');
+document.querySelectorAll('#kindFilter .type-btn').forEach((b) => b.addEventListener('click', () => syncKind(b.dataset.k)));
+skType.addEventListener('change', () => {
+  const s = kindList()[Number(skType.value)];
+  if (s) { current = s; skSearch.value = s.title; updateClear(); setStep(1); }
+});
+slider.addEventListener('input', () => setStep(Number(slider.value)));
+levelDown.addEventListener('click', () => setStep(Number(slider.value) - 1));
+levelUp.addEventListener('click', () => setStep(Number(slider.value) + 1));
+skSearch.addEventListener('input', () => { activeIdx = -1; updateClear(); refreshList(); skSearchList.hidden = matches.length === 0; });
+skSearch.addEventListener('focus', () => { refreshList(); if (matches.length) skSearchList.hidden = false; });
+skSearch.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!matches.length) return;
+    const n = Math.min(matches.length, 60);
+    activeIdx = e.key === 'ArrowDown' ? (activeIdx + 1) % n : (activeIdx - 1 + n) % n;
+    refreshList();
+  } else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pick(activeIdx); }
+  else if (e.key === 'Escape') { skSearchList.hidden = true; }
+});
+skSearch.addEventListener('blur', () => { skSearchList.hidden = true; });
+skClear.addEventListener('click', () => { skSearch.value = ''; updateClear(); refreshList(); skSearch.focus(); });
+setStatus('busy', 'LOADING');
+fillTypeSelect();
+refreshList();
+const first = items.find((s) => s.title === 'Panzer Leader') || items[0];
+current = first; skSearch.value = first.title; updateClear();
+skType.value = String(Math.max(0, kindList().indexOf(first)));
+setStep(1);
+</script>
+</body>
+</html>

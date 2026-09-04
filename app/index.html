@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Conqueror 4 Community Database</title>
+<link rel="icon" type="image/png" href="media/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=18">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar__left"><div class="topbar__brand">
+    <div class="topbar__mark topbar__mark--logo"><img src="media/logo.png" alt="WC4 logo"></div>
+    <div class="topbar__title"><h1>World Conqueror 4</h1><p>Community Database</p></div>
+  </div></div>
+  <nav class="pagenav" aria-label="Site navigation">
+    <a href="index.html" class="pagenav--active"><img class="navicon" src="media/home.png" alt="">Home</a>
+    <a href="generals.html"><img class="navicon" src="media/military-hat.png" alt="">Generals</a>
+    <a href="elite.html"><img class="navicon" src="media/star.png" alt="">Elite Forces</a>
+    <a href="skills.html"><img class="navicon" src="media/crown.png" alt="">Skills</a>
+    <a href="calculator.html"><img class="navicon" src="media/calculator.png" alt="">Calculator</a>
+  </nav>
+  <div class="topbar__status status--ready"><span class="status-dot"></span><span class="status-text">ONLINE</span></div>
+</header>
+<main class="console">
+  <div class="side-panel">
+    <aside class="log-panel" aria-label="General information">
+      <div class="log-panel__header"><img class="hicon" src="media/promotion.png" alt=""><h2>General Information</h2></div>
+      <ul class="log-list log-list--timeline">
+        <li class="log-item"><span class="log-item__date">Free access</span>Every record is searchable with no account and no paywall.</li>
+        <li class="log-item"><span class="log-item__date">Verified data</span>Stats carry max technology, matching maxed in-game troops.</li>
+      </ul>
+    </aside>
+  </div>
+  <div class="console__main">
+    <section class="dossier" aria-label="About this application">
+      <div class="dossier__header"><h2>Home</h2></div>
+      <div class="home-lead">
+        <h2>Everything about this application</h2>
+        <p>This database is built for the World Conqueror community: free access and easy search across generals, elite forces and skills — ranks, stars, per-level stats with max technology, upgrade costs and full skill effects.</p>
+        <p>Use the search bars to find anything by name, filter by tier or unit type, and drag the level sliders to inspect every stage of progression. Pick a system below to start searching.</p>
+      </div>
+      <div class="home-stats" id="homeStats"></div>
+      <div class="home-grid">
+        <a class="home-card" href="generals.html"><h3>Generals</h3><p id="cGen">Search generals, ranks, stars and skills.</p></a>
+        <a class="home-card" href="elite.html"><h3>Elite Forces</h3><p id="cElite">Search units with a 1–12 level slider.</p></a>
+        <a class="home-card" href="skills.html"><h3>Skills</h3><p id="cSkill">Search skills level by level.</p></a>
+        <a class="home-card" href="calculator.html"><h3>Calculator</h3><p>Damage calculator — coming soon.</p></a>
+      </div>
+      <div class="home-lead" style="padding-top:0;">
+        <h2>How to use</h2>
+        <p><b>1. Search</b> — type a few letters; results filter instantly. <b>2. Filter</b> — pills narrow by tier or unit type and auto-load the first match. <b>3. Inspect</b> — move level sliders to compare stats, costs and skills at every stage. Hover any skill medal or chip for its full effect text.</p>
+      </div>
+      <div class="home-lead" style="padding-top:0;" id="coverageWrap">
+        <h2>Coverage</h2>
+        <p id="coverage">Loading…</p>
+      </div>
+    </section>
+  </div>
+</main>
+<a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
+<footer class="footer"><p>WC4 Community Database</p></footer>
+<script src="js/data_generals.js?v=18"></script>
+<script src="js/data_eliteforce.js?v=18"></script>
+<script src="js/data_skills.js?v=18"></script>
+<script>
+document.getElementById('cGen').textContent = `Search ${WC4_GENERALS.length} generals, ranks, stars and skills.`;
+document.getElementById('cElite').textContent = `Search ${WC4_ELITE.length} units with a 1–12 level slider.`;
+document.getElementById('cSkill').textContent = `Search ${WC4_SKILLS.general_skills.length + WC4_SKILLS.elite_skills.length} skills level by level.`;
+document.getElementById('coverage').textContent = `${WC4_GENERALS.length} generals · ${WC4_ELITE.length} elite units · ${WC4_SKILLS.general_skills.length} general skills · ${WC4_SKILLS.elite_skills.length} elite force skills, all with max technology.`;
+document.getElementById('homeStats').innerHTML = [
+  [WC4_GENERALS.length, 'Generals'], [WC4_ELITE.length, 'Elite Units'],
+  [WC4_SKILLS.general_skills.length, 'General Skills'], [WC4_SKILLS.elite_skills.length, 'Elite Skills']
+].map(([n, l]) => `<div class="home-stat"><b>${n}</b><span>${l}</span></div>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Conqueror 4 Generals Database</title>
+<link rel="icon" type="image/png" href="media/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=18">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar__left"><div class="topbar__brand">
+    <div class="topbar__mark topbar__mark--logo"><img src="media/logo.png" alt="WC4 logo"></div>
+    <div class="topbar__title"><h1>World Conqueror 4</h1><p>Generals Database</p></div>
+  </div></div>
+  <nav class="pagenav" aria-label="Site navigation">
+    <a href="index.html"><img class="navicon" src="media/home.png" alt="">Home</a>
+    <a href="generals.html" class="pagenav--active"><img class="navicon" src="media/military-hat.png" alt="">Generals</a>
+    <a href="elite.html"><img class="navicon" src="media/star.png" alt="">Elite Forces</a>
+    <a href="skills.html"><img class="navicon" src="media/crown.png" alt="">Skills</a>
+    <a href="calculator.html"><img class="navicon" src="media/calculator.png" alt="">Calculator</a>
+  </nav>
+  <div id="statusLight" class="topbar__status status--idle"><span class="status-dot"></span><span class="status-text">STANDBY</span></div>
+</header>
+<main class="console">
+  <div class="side-panel">
+    <aside class="log-panel" aria-label="General information">
+      <div class="log-panel__header"><img class="hicon" src="media/promotion.png" alt=""><h2>General Information</h2></div>
+      <ul class="log-list log-list--timeline">
+      <li class="log-item"><span class="log-item__date">Tiers</span>Filter bronze, silver, gold, purple and orange generals; multi-state generals switch colors from the name.</li>
+      <li class="log-item"><span class="log-item__date">Stars</span>Six branch ratings with true damage values on hover.</li>
+      <li class="log-item"><span class="log-item__date">Skills</span>Hover any medal for its full effect text.</li>
+      </ul>
+    </aside>
+    <div class="log-panel links-panel" aria-label="Related WC4 tools">
+      <div class="log-panel__header"><img class="hicon" src="media/layer.png" alt=""><h2>Other Systems:</h2></div>
+      <div class="links-panel__body">
+        <a class="sister-link" href="elite.html"><span class="sister-link__name">WC4 Elite Force Database</span><span class="sister-link__url">Browse all 50 elite forces with per-level stats.</span></a>
+        <a class="sister-link" href="calculator.html"><span class="sister-link__name">WC4 Damage Calculator</span><span class="sister-link__url">Compare damage between setups. Coming soon.</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="console__main">
+    <section class="search-card" aria-label="General name search">
+      <div class="field"><label for="genSearch">Search General</label>
+        <div class="combo__wrap">
+          <svg class="combo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="genSearch" type="text" placeholder="Type a general name…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="genSearchList">
+          <button class="combo__clear" id="genClear" type="button" aria-label="Clear search" hidden>×</button>
+          <ul id="genSearchList" class="combo__list" role="listbox" hidden></ul>
+        </div>
+      </div>
+    </section>
+    <section class="type-filter" id="typeFilter" aria-label="Tier filter"></section>
+    <section class="query-panel" aria-label="General query" hidden>
+      <div class="field"><label for="genSelect">General</label><select id="genSelect"></select></div>
+    </section>
+    <section id="resultPanel" class="result-panel" aria-live="polite"><div class="result-empty"><p>Loading generals…</p></div></section>
+  </div>
+</main>
+<a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
+<footer class="footer"><p>WC4 Community Database</p></footer>
+<script src="js/data_generals.js?v=18"></script>
+<script src="js/data_portraits.js?v=18"></script>
+<script src="js/data_skill_icons.js?v=18"></script>
+<script src="js/data_general_extra.js?v=18"></script>
+<script src="js/app.js?v=18"></script>
+<script>
+const STAR_VALUE = [0, 4, 8, 13, 16, 24, 30];
+const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2Z"/></svg>';
+const TIER_META = {
+  bronze: { label: 'Bronze', color: '#8a5a2b', icon: STAR_SVG },
+  silver: { label: 'Silver', color: '#6c7a88', icon: STAR_SVG },
+  gold: { label: 'Gold', color: '#d0a020', icon: STAR_SVG },
+  purple: { label: 'Purple', color: '#7c3aed', icon: STAR_SVG },
+  orange: { label: 'Orange', color: '#ea580c', icon: STAR_SVG }
+};
+const TIERS = ['bronze', 'silver', 'gold', 'purple', 'orange'];
+const BRANCHES = [
+  ['Infantry', 'infantry_stars', 'media/soldier.png'],
+  ['Armored', 'armored_stars', 'media/tank.png'],
+  ['Air Force', 'airforce_stars', 'media/air.png'],
+  ['Artillery', 'artillery_stars', 'media/artillery.png'],
+  ['Navy', 'navy_stars', 'media/ship.png'],
+  ['Marching', 'marching_stars', 'media/boots.png']
+];
+function baseName(n) { return (n || '').replace(/\s*\((Bronze|Gold|Silver|Purple|Orange|Trained)\)\s*/g, '').trim() || n; }
+const VARIANTS = {};
+WC4_GENERALS.forEach((g, i) => {
+  g._idx = i;
+  const b = baseName(g.name);
+  (VARIANTS[b] = VARIANTS[b] || []).push(g);
+});
+Object.values(VARIANTS).forEach((list) => list.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)));
+let tier = 'all', matches = [], activeIdx = -1;
+const genSearch = document.getElementById('genSearch'), genSearchList = document.getElementById('genSearchList');
+const genClear = document.getElementById('genClear');
+const genSelect = document.getElementById('genSelect'), resultPanel = document.getElementById('resultPanel');
+const statusLight = document.getElementById('statusLight');
+function setStatus(s, t) { statusLight.className = 'topbar__status status--' + s; statusLight.innerHTML = '<span class="status-dot"></span><span class="status-text">' + t + '</span>'; }
+function portraitFor(g) { return (WC4_PORTRAITS.generals[g.name + '|' + g.tier]) || 'assets/generals/general.png'; }
+function starSlots(v) {
+  let s = '';
+  for (let i = 0; i < 6; i++) s += i < v ? '<span class="star--on">★</span>' : '<span class="star--off">☆</span>';
+  const cls = v >= 6 ? 'bstars bstars--max' : (v === 5 ? 'bstars' : 'bstars bstars--silver');
+  return `<span class="${cls}">${s}</span>`;
+}
+function render(g) {
+  const extra = ((typeof WC4_GENERAL_EXTRA !== 'undefined' ? WC4_GENERAL_EXTRA : {}) || {})[g.name + '|' + g.tier] || {};
+  const dispName = baseName(g.name);
+  const variants = VARIANTS[dispName] || [g];
+  const tm = TIER_META[g.tier] || TIER_META.silver;
+  const num = '#' + String(g._idx + 1).padStart(3, '0');
+  const medals = g.skills.map((s) => {
+    const it = WC4_SKILL_ICONS[s.title];
+    const img = it != null ? `<img src="media/skills/${it}.webp" alt="" onerror="this.remove()">` : '';
+    return `<div class="skill-card2" tabindex="0">${img}<span class="skill-card2__lv">Lv ${s.level}</span><span class="skill-card2__name">${escapeHtml(s.title)}</span><div class="tip"><b>${escapeHtml(s.title)}</b><p>${escapeHtml(s.description)}</p></div></div>`;
+  }).join('');
+  const emptySlots = Array.from({ length: Math.max(0, 5 - g.skills.length) }, () => '<div class="skill-card2 skill-card2--empty">+</div>').join('');
+  resultPanel.innerHTML = `<div class="dossier"><div class="gen-dossier">
+    <div>
+      <div class="gen-photo" style="background:linear-gradient(165deg, ${tm.color}55 0%, ${tm.color}1f 45%, #eef1f6 100%);">
+        <img src="${portraitFor(g)}" alt="${escapeHtml(dispName)}" onerror="this.src='assets/generals/general.png'">
+      </div>
+      <div class="gen-name">${escapeHtml(dispName)}${variants.length > 1 ? `<button type="button" id="nameplateBtn" aria-label="Choose variant">▾</button>` : ''}</div>
+      <div class="gen-rank"><img class="gen-rank__icon" src="media/rank.png" alt="">${escapeHtml(g.rank) || '—'}</div>
+      <div class="variant-menu" id="variantMenu" hidden>${variants.map((v) => `<button type="button" data-v="${escapeHtml(v.name)}|${v.tier}"${v.name === g.name && v.tier === g.tier ? ' aria-current="true"' : ''}>${escapeHtml(v.tier.charAt(0).toUpperCase() + v.tier.slice(1))}</button>`).join('')}</div></div>
+    <div>
+      <div class="branch-cards">
+        ${BRANCHES.map(([label, key, icon]) => `<div class="branch-card"><img src="${icon}" alt=""><div><div class="branch-card__label">${label}</div><div class="branch-card__stars" data-tip="+${STAR_VALUE[Math.min(6, g[key] || 0)]} damage">${starSlots(g[key])}<span class="branch-card__count">${g[key] || 0} / 6</span></div></div></div>`).join('')}
+      </div>
+      <div class="skills-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2Z"/></svg>SKILLS</div>
+      <div class="skill-cards">${medals}${emptySlots}</div>
+    </div>
+  </div></div>`;
+  const npBtn = document.getElementById('nameplateBtn');
+  const vMenu = document.getElementById('variantMenu');
+  if (npBtn && vMenu) {
+    npBtn.addEventListener('click', () => { vMenu.hidden = !vMenu.hidden; });
+    vMenu.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+      vMenu.hidden = true;
+      const [n, t] = b.dataset.v.split('|');
+      const v = WC4_GENERALS.find((x) => x.name === n && x.tier === t);
+      if (v) {
+        if (v.tier !== tier && tier !== 'all') applyTier(v.tier);
+        genSearch.value = v.name;
+        genSelect.value = v.name + '|' + v.tier;
+        render(v);
+      }
+    }));
+  }
+  setStatus('ready', 'RECORD FOUND');
+}
+function syncSelect() {
+  const list = tier === 'all' ? WC4_GENERALS : WC4_GENERALS.filter((g) => g.tier === tier);
+  genSelect.innerHTML = list.map((g) => `<option value="${escapeHtml(g.name)}|${g.tier}">${escapeHtml(g.name)}</option>`).join('');
+  const g = list[0];
+  if (g) { genSearch.value = g.name; updateClear(); render(g); }
+}
+function applyTier(t) {
+  tier = t;
+  document.querySelectorAll('#typeFilter .type-btn').forEach((x) => x.classList.toggle('type-btn--active', x.dataset.t === t));
+  syncSelect();
+  refreshList();
+}
+function filtered() {
+  const q = genSearch.value.trim().toLowerCase();
+  return WC4_GENERALS.filter((g) => (tier === 'all' || g.tier === tier) && (!q || g.name.toLowerCase().includes(q)));
+}
+function refreshList() {
+  matches = filtered();
+  if (activeIdx > matches.length - 1) activeIdx = -1;
+  genSearchList.innerHTML = matches.slice(0, 60).map((g, i) =>
+    `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(g.name)}<small>&nbsp;· ${escapeHtml(g.tier)}</small></li>`).join('');
+  genSearchList.querySelectorAll('.combo__item').forEach((el) =>
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); pick(Number(el.dataset.i)); }));
+}
+function pick(i) {
+  const g = matches[i];
+  if (!g) return;
+  genSearch.value = g.name;
+  updateClear();
+  genSearchList.hidden = true;
+  if (g.tier !== tier && tier !== 'all') applyTier(g.tier);
+  genSelect.value = g.name + '|' + g.tier;
+  render(g);
+}
+function updateClear() { genClear.hidden = genSearch.value.trim() === ''; }
+document.getElementById('typeFilter').innerHTML =
+  [`<button type="button" class="type-btn type-btn--active" data-t="all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>All</button>`,
+   ...TIERS.map((t) => `<button type="button" class="type-btn" data-t="${t}">${TIER_META[t].icon}${TIER_META[t].label}</button>`)].join('');
+document.querySelectorAll('#typeFilter .type-btn').forEach((b) => b.addEventListener('click', () => applyTier(b.dataset.t)));
+genSelect.addEventListener('change', () => {
+  const [n, t] = genSelect.value.split('|');
+  const g = WC4_GENERALS.find((x) => x.name === n && x.tier === t);
+  if (g) { genSearch.value = g.name; updateClear(); render(g); }
+});
+genSearch.addEventListener('input', () => { activeIdx = -1; updateClear(); refreshList(); genSearchList.hidden = matches.length === 0; });
+genSearch.addEventListener('focus', () => { refreshList(); if (matches.length) genSearchList.hidden = false; });
+genSearch.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!matches.length) return;
+    const n = Math.min(matches.length, 60);
+    activeIdx = e.key === 'ArrowDown' ? (activeIdx + 1) % n : (activeIdx - 1 + n) % n;
+    refreshList();
+  } else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pick(activeIdx); }
+  else if (e.key === 'Escape') { genSearchList.hidden = true; }
+});
+genSearch.addEventListener('blur', () => { genSearchList.hidden = true; });
+genClear.addEventListener('click', () => { genSearch.value = ''; updateClear(); refreshList(); genSearch.focus(); });
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('variantMenu');
+  if (m && !m.hidden && !e.target.closest('#variantMenu') && !e.target.closest('#nameplateBtn')) m.hidden = true;
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { const m = document.getElementById('variantMenu'); if (m) m.hidden = true; }
+});
+setStatus('busy', 'LOADING');
+syncSelect();
+refreshList();
+</script>
+</body>
+</html>

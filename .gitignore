@@ -1,0 +1,25 @@
+# ===== WC4 Database project =====
+# Tracked: app/** (runtime site) + Extracted/** (data sources + docs).
+# Everything below is unnecessary for the app to run.
+
+# --- Source package + extraction intermediates (hundreds of MB) ---
+*.xapk
+WC4_Extracted/
+WC4_Organized/
+
+# --- Local agent/tooling state (regenerable) ---
+.agents/
+.claude/
+.playwright-cli/
+skills-lock.json
+
+# --- OS junk ---
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- Editors / temp ---
+.vscode/
+*.swp
+*.tmp
+*.log
