@@ -66,7 +66,9 @@ improvements, calculator work, documentation, and new features. See
 
 ## Contributors
 
-Created by **JVrylle** and improved with contributions from the WC4 community.
+Created by **JVrylle** and improved with contributions from the WC4 community
+(see [CONTRIBUTORS.md](CONTRIBUTORS.md)). Special thanks to **Nuclearman** and
+**Styx**.
 Individual contributions are recorded in the Git history — please see the
 repository's commit and Pull Request history as the source of truth.
 

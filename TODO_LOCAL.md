@@ -74,6 +74,10 @@ _Last updated: 2026-09-05_
 - [x] Calculator shell: A / B / Enemy panels, formula inputs, basic modifiers, HP sliders (`calculator.html`)
 - [x] Static site with no build step (plain HTML/CSS/JS, `js/` + `css/` + `media/`)
 - [x] Open-source presentation: `LICENSE` (MIT), `README.md`, `CONTRIBUTING.md`, footer attribution on all 5 pages (2026-09-05)
+- [x] Footer redesign (nav + brand + disclaimer, `?v=19`) and `CONTRIBUTORS.md` contributors list (2026-09-05)
+- [x] Footer nav gap increase (`?v=20`), Special Thanks (Nuclearman, Styx) + Contributors sections (2026-09-05)
+- [x] Footer credits line (Contributors + Special thanks) on all 5 pages (2026-09-05)
+- [x] Donate modal (`js/support.js`, `?v=21`): recipient notice naming JVrylle as owner, Continue/Cancel (2026-09-05)
 
 ---
 

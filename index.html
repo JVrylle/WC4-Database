@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=18">
-<link rel="stylesheet" href="css/app.css?v=18">
+<link rel="stylesheet" href="css/style.css?v=21">
+<link rel="stylesheet" href="css/app.css?v=21">
 </head>
 <body>
 <header class="topbar">
@@ -63,10 +63,23 @@
   </div>
 </main>
 <a class="donate-btn" href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi"><img class="hicon" src="media/heart.png" alt=""><span>Donate to Support</span></a>
-<footer class="footer"><p>WC4 Database • Created by JVrylle</p><p>Unofficial fan-made project</p></footer>
-<script src="js/data_generals.js?v=18"></script>
-<script src="js/data_eliteforce.js?v=18"></script>
-<script src="js/data_skills.js?v=18"></script>
+<footer class="footer">
+  <nav class="footer__nav" aria-label="Footer navigation">
+    <a href="index.html">Home</a>
+    <a href="generals.html">Generals</a>
+    <a href="elite.html">Elite Forces</a>
+    <a href="skills.html">Skills</a>
+    <a href="calculator.html">Calculator</a>
+    <a href="https://ko-fi.com/jvrylle" target="_blank" rel="noopener noreferrer">Support</a>
+  </nav>
+  <p class="footer__brand">WC4 Database • Created by JVrylle</p>
+  <p>Contributors: JVrylle • Special thanks to Nuclearman and Styx</p>
+  <p>Unofficial fan-made project — not affiliated with the developers of World Conqueror 4.</p>
+</footer>
+<script src="js/data_generals.js?v=21"></script>
+<script src="js/data_eliteforce.js?v=21"></script>
+<script src="js/data_skills.js?v=21"></script>
+<script src="js/support.js?v=21"></script>
 <script>
 document.getElementById('cGen').textContent = `Search ${WC4_GENERALS.length} generals, ranks, stars and skills.`;
 document.getElementById('cElite').textContent = `Search ${WC4_ELITE.length} units with a 1–12 level slider.`;
