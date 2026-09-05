@@ -91,6 +91,6 @@ third-party World Conqueror 4 intellectual property (see Disclaimer below).
 ## Disclaimer
 
 WC4 Database is an unofficial fan-made project. It is not affiliated with,
-sponsored by, or officially endorsed by the developers or publishers of World
-Conqueror 4. World Conqueror 4, and all related game assets, artwork, characters,
+sponsored by, or officially endorsed by EasyTech, the developer of World
+Conqueror 4, or its publishers. World Conqueror 4, and all related game assets, artwork, characters,
 and trademarks, belong to their respective owners.

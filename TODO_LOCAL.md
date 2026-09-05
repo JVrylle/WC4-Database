@@ -78,6 +78,7 @@ _Last updated: 2026-09-05_
 - [x] Footer nav gap increase (`?v=20`), Special Thanks (Nuclearman, Styx) + Contributors sections (2026-09-05)
 - [x] Footer credits line (Contributors + Special thanks) on all 5 pages (2026-09-05)
 - [x] Donate modal (`js/support.js`, `?v=21`): recipient notice naming JVrylle as owner, Continue/Cancel (2026-09-05)
+- [x] Disclaimer hardened: EasyTech named as game developer, no dev/ownership claims (2026-09-05)
 
 ---
 
