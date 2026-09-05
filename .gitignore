@@ -13,6 +13,9 @@ WC4_Organized/
 .playwright-cli/
 skills-lock.json
 
+# --- Local-only working lists (never commit) ---
+TODO_LOCAL.md
+
 # --- OS junk ---
 Thumbs.db
 desktop.ini
