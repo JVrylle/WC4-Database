@@ -24,3 +24,6 @@ desktop.ini
 *.swp
 *.tmp
 *.log
+
+# --- Local launcher scripts ---
+open-site.bat
