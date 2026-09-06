@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
-<link rel="stylesheet" href="css/app.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=24">
+<link rel="stylesheet" href="css/app.css?v=24">
 </head>
 <body>
 <header class="topbar">
@@ -76,17 +76,19 @@
   <p>Contributors: JVrylle • Special thanks to Nuclearman and Styx</p>
   <p>Unofficial fan-made project — not affiliated with EasyTech, the developer of World Conqueror 4.</p>
 </footer>
-<script src="js/data_generals.js?v=21"></script>
-<script src="js/data_eliteforce.js?v=21"></script>
-<script src="js/data_skills.js?v=21"></script>
-<script src="js/support.js?v=21"></script>
+<script src="js/data_generals.js?v=24"></script>
+<script src="js/data_eliteforce.js?v=24"></script>
+<script src="js/data_skills.js?v=24"></script>
+<script src="js/support.js?v=24"></script>
 <script>
-document.getElementById('cGen').textContent = `Search ${WC4_GENERALS.length} generals, ranks, stars and skills.`;
+const __genBase = (n) => (n || '').replace(/\s*\((Bronze|Gold|Silver|Purple|Orange|Trained)\)\s*/g, '').trim() || n;
+const __uniqueGenerals = new Set(WC4_GENERALS.map((g) => __genBase(g.name))).size;
+document.getElementById('cGen').textContent = `Search ${__uniqueGenerals} generals (not including color variants), ranks, stars and skills.`;
 document.getElementById('cElite').textContent = `Search ${WC4_ELITE.length} units with a 1–12 level slider.`;
 document.getElementById('cSkill').textContent = `Search ${WC4_SKILLS.general_skills.length + WC4_SKILLS.elite_skills.length} skills level by level.`;
-document.getElementById('coverage').textContent = `${WC4_GENERALS.length} generals · ${WC4_ELITE.length} elite units · ${WC4_SKILLS.general_skills.length} general skills · ${WC4_SKILLS.elite_skills.length} elite force skills, all with max technology.`;
+document.getElementById('coverage').textContent = `${__uniqueGenerals} generals (not including color variants) · ${WC4_ELITE.length} elite units · ${WC4_SKILLS.general_skills.length} general skills · ${WC4_SKILLS.elite_skills.length} elite force skills, all with max technology.`;
 document.getElementById('homeStats').innerHTML = [
-  [WC4_GENERALS.length, 'Generals'], [WC4_ELITE.length, 'Elite Units'],
+  [__uniqueGenerals, 'Generals'], [WC4_ELITE.length, 'Elite Units'],
   [WC4_SKILLS.general_skills.length, 'General Skills'], [WC4_SKILLS.elite_skills.length, 'Elite Skills']
 ].map(([n, l]) => `<div class="home-stat"><b>${n}</b><span>${l}</span></div>`).join('');
 </script>

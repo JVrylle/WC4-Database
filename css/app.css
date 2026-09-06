@@ -226,3 +226,18 @@ button.nameplate { cursor: pointer; }
 .info-box__value--blue { background: #e3edfd; color: #1d4fd7; }
 .info-box__value--green { background: #e3f5e1; color: #1e8e3e; }
 @media (max-width: 640px) { .sk-dossier { grid-template-columns: 1fr; } .info-row { grid-template-columns: 1fr; } }
+/* ---- general color-variant tier buttons (beside the General dropdown) ---- */
+.gen-row { display: flex; gap: 8px; align-items: center; }
+.gen-row select { flex: 1 1 auto; min-width: 0; width: auto; }
+.tier-btns { display: flex; gap: 6px; flex-wrap: wrap; flex: 0 0 auto; }
+.tier-btns[hidden] { display: none; }
+.tier-btn { --tier-c: #64748b; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-family: var(--font-body); font-size: 11.5px; font-weight: 700; color: var(--text-dim); cursor: pointer; }
+.tier-btn::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--tier-c); flex: 0 0 auto; }
+.tier-btn[data-t="bronze"] { --tier-c: #8a5a2b; }
+.tier-btn[data-t="silver"] { --tier-c: #6c7a88; }
+.tier-btn[data-t="gold"] { --tier-c: #d0a020; }
+.tier-btn[data-t="purple"] { --tier-c: #7c3aed; }
+.tier-btn[data-t="orange"] { --tier-c: #ea580c; }
+.tier-btn:hover { border-color: var(--tier-c); color: var(--tier-c); }
+.tier-btn--on { background: var(--tier-c); border-color: var(--tier-c); color: #fff; }
+.tier-btn--on::before { background: #fff; }

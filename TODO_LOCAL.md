@@ -19,11 +19,7 @@ _Last updated: 2026-09-06_
 ## Not Done
 
 ### Generals DB (`generals.html`, `js/data_generals.js`)
-- [ ] 1. Fix total count to 169 — remove duplicates: Bock (Gold), Bock (Orange), Bock (Silver)
-- [ ] 2. Make slider UI / choices for general categories [bronze, silver, gold, orange]
-- [ ] 3. Fix Marching branch showing damage instead of mobility
-- [ ] 4. Make the list alphabetical
-- [ ] 5. Cap purple generals at 5 skills max (currently allows more) (`generals.html`, `js/data_generals.js`)
+- [ ] _None — all done._
 
 ### Elite Forces DB (`elite.html`, `js/data_eliteforce.js`)
 - [ ] 1. Fix hover range data error — values like 2-3 range don't fit the single-bar UI
@@ -86,6 +82,12 @@ _Last updated: 2026-09-06_
 - [x] 11. Footer credits line (Contributors + Special thanks) on all 5 pages (2026-09-05)
 - [x] 12. Donate modal (`js/support.js`, `?v=21`): recipient notice naming JVrylle as owner, Continue/Cancel (2026-09-05)
 - [x] 13. Disclaimer hardened: EasyTech named as game developer, no dev/ownership claims (2026-09-05)
+- [x] 14. Generals dedupe: 169 rows = 129 unique + `hasVariants` flag, 1 row per general + tier buttons on Generals DB + Calculator, `?v=23` (2026-09-06)
+- [x] 15. Orange generals' 2nd portrait: gold variants pointed back to base portrait (9 fixed) (`js/data_portraits.js`, 2026-09-06)
+- [x] 16. Tier filter buttons instead of slider UI (`generals.html`, 2026-09-06)
+- [x] 17. Marching hover shows mobility, 1 per star (`generals.html`, 2026-09-06)
+- [x] 18. Alphabetical dropdowns on all pages (`generals.html`, `calculator.html`, `elite.html`, `skills.html`, `js/calc.js`, 2026-09-06)
+- [x] 19. Calculator general skills capped at 5 total after Compare (`js/calc.js`, 2026-09-06)
 
 ---
 

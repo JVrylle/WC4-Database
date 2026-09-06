@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
-<link rel="stylesheet" href="css/app.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=24">
+<link rel="stylesheet" href="css/app.css?v=24">
 </head>
 <body>
 <header class="topbar">
@@ -31,8 +31,8 @@
     <aside class="log-panel" aria-label="General information">
       <div class="log-panel__header"><img class="hicon" src="media/promotion.png" alt=""><h2>General Information</h2></div>
       <ul class="log-list log-list--timeline">
-      <li class="log-item"><span class="log-item__date">Tiers</span>Filter bronze, silver, gold, purple and orange generals; multi-state generals switch colors from the name.</li>
-      <li class="log-item"><span class="log-item__date">Stars</span>Six branch ratings with true damage values on hover.</li>
+      <li class="log-item"><span class="log-item__date">Tiers</span>Filter bronze, silver, gold, purple and orange generals; multi-color generals show one entry — switch colors with the buttons beside the General dropdown.</li>
+      <li class="log-item"><span class="log-item__date">Stars</span>Six branch ratings with true values on hover (Marching stars = mobility).</li>
       <li class="log-item"><span class="log-item__date">Skills</span>Hover any medal for its full effect text.</li>
       </ul>
     </aside>
@@ -56,8 +56,10 @@
       </div>
     </section>
     <section class="type-filter" id="typeFilter" aria-label="Tier filter"></section>
-    <section class="query-panel" aria-label="General query" hidden>
-      <div class="field"><label for="genSelect">General</label><select id="genSelect"></select></div>
+    <section class="query-panel" aria-label="General query">
+      <div class="field"><label for="genSelect">General</label>
+        <div class="gen-row"><select id="genSelect"></select><div id="tierBtns" class="tier-btns" role="group" aria-label="Color variants"></div></div>
+      </div>
     </section>
     <section id="resultPanel" class="result-panel" aria-live="polite"><div class="result-empty"><p>Loading generals…</p></div></section>
   </div>
@@ -76,12 +78,12 @@
   <p>Contributors: JVrylle • Special thanks to Nuclearman and Styx</p>
   <p>Unofficial fan-made project — not affiliated with EasyTech, the developer of World Conqueror 4.</p>
 </footer>
-<script src="js/data_generals.js?v=21"></script>
-<script src="js/data_portraits.js?v=21"></script>
-<script src="js/data_skill_icons.js?v=21"></script>
-<script src="js/data_general_extra.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
-<script src="js/support.js?v=21"></script>
+<script src="js/data_generals.js?v=24"></script>
+<script src="js/data_portraits.js?v=24"></script>
+<script src="js/data_skill_icons.js?v=24"></script>
+<script src="js/data_general_extra.js?v=24"></script>
+<script src="js/app.js?v=24"></script>
+<script src="js/support.js?v=24"></script>
 <script>
 const STAR_VALUE = [0, 4, 8, 13, 16, 24, 30];
 const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2Z"/></svg>';
@@ -110,6 +112,40 @@ WC4_GENERALS.forEach((g, i) => {
 });
 Object.values(VARIANTS).forEach((list) => list.sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)));
 let tier = 'all', matches = [], activeIdx = -1;
+const tierBtns = document.getElementById('tierBtns');
+const capTier = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+function resolveVariant(b, pref) {
+  const list = VARIANTS[b] || [];
+  if (pref && pref !== 'all') { const v = list.find((x) => x.tier === pref); if (v) return v; }
+  return list[0] || null;
+}
+function canonicalList() {
+  return Object.keys(VARIANTS)
+    .map((b) => resolveVariant(b, tier))
+    .filter((v) => v && (tier === 'all' || v.tier === tier))
+    .sort((a, b) => baseName(a.name).localeCompare(baseName(b.name)));
+}
+function switchVariant(b, t) {
+  const v = (VARIANTS[b] || []).find((x) => x.tier === t);
+  if (!v) return;
+  if (v.tier !== tier && tier !== 'all') applyTier(v.tier);
+  genSearch.value = b;
+  updateClear();
+  genSelect.value = v.name + '|' + v.tier;
+  render(v);
+}
+function renderTierBtns(g) {
+  const b = baseName(g.name);
+  const list = VARIANTS[b] || [g];
+  const multi = g.hasVariants === true || list.length > 1;
+  if (!multi) { tierBtns.innerHTML = ''; tierBtns.hidden = true; return; }
+  tierBtns.hidden = false;
+  tierBtns.innerHTML = list.map((v) => {
+    const on = (v.name === g.name && v.tier === g.tier);
+    return `<button type="button" class="tier-btn${on ? ' tier-btn--on' : ''}" data-t="${v.tier}" aria-pressed="${on}">${capTier(v.tier)}</button>`;
+  }).join('');
+  tierBtns.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => switchVariant(b, btn.dataset.t)));
+}
 const genSearch = document.getElementById('genSearch'), genSearchList = document.getElementById('genSearchList');
 const genClear = document.getElementById('genClear');
 const genSelect = document.getElementById('genSelect'), resultPanel = document.getElementById('resultPanel');
@@ -125,7 +161,6 @@ function starSlots(v) {
 function render(g) {
   const extra = ((typeof WC4_GENERAL_EXTRA !== 'undefined' ? WC4_GENERAL_EXTRA : {}) || {})[g.name + '|' + g.tier] || {};
   const dispName = baseName(g.name);
-  const variants = VARIANTS[dispName] || [g];
   const tm = TIER_META[g.tier] || TIER_META.silver;
   const num = '#' + String(g._idx + 1).padStart(3, '0');
   const medals = g.skills.map((s) => {
@@ -139,40 +174,28 @@ function render(g) {
       <div class="gen-photo" style="background:linear-gradient(165deg, ${tm.color}55 0%, ${tm.color}1f 45%, #eef1f6 100%);">
         <img src="${portraitFor(g)}" alt="${escapeHtml(dispName)}" onerror="this.src='assets/generals/general.png'">
       </div>
-      <div class="gen-name">${escapeHtml(dispName)}${variants.length > 1 ? `<button type="button" id="nameplateBtn" aria-label="Choose variant">▾</button>` : ''}</div>
-      <div class="gen-rank"><img class="gen-rank__icon" src="media/rank.png" alt="">${escapeHtml(g.rank) || '—'}</div>
-      <div class="variant-menu" id="variantMenu" hidden>${variants.map((v) => `<button type="button" data-v="${escapeHtml(v.name)}|${v.tier}"${v.name === g.name && v.tier === g.tier ? ' aria-current="true"' : ''}>${escapeHtml(v.tier.charAt(0).toUpperCase() + v.tier.slice(1))}</button>`).join('')}</div></div>
+      <div class="gen-name">${escapeHtml(dispName)}</div>
+      <div class="gen-rank"><img class="gen-rank__icon" src="media/rank.png" alt="">${escapeHtml(g.rank) || '—'}</div></div>
     <div>
       <div class="branch-cards">
-        ${BRANCHES.map(([label, key, icon]) => `<div class="branch-card"><img src="${icon}" alt=""><div><div class="branch-card__label">${label}</div><div class="branch-card__stars" data-tip="+${STAR_VALUE[Math.min(6, g[key] || 0)]} damage">${starSlots(g[key])}<span class="branch-card__count">${g[key] || 0} / 6</span></div></div></div>`).join('')}
+        ${BRANCHES.map(([label, key, icon]) => {
+          const stars = g[key] || 0;
+          const tip = key === 'marching_stars' ? `+${stars} mobility` : `+${STAR_VALUE[Math.min(6, stars)]} damage`;
+          return `<div class="branch-card"><img src="${icon}" alt=""><div><div class="branch-card__label">${label}</div><div class="branch-card__stars" data-tip="${tip}">${starSlots(g[key])}<span class="branch-card__count">${g[key] || 0} / 6</span></div></div></div>`;
+        }).join('')}
       </div>
       <div class="skills-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 16.9 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2Z"/></svg>SKILLS</div>
       <div class="skill-cards">${medals}${emptySlots}</div>
     </div>
   </div></div>`;
-  const npBtn = document.getElementById('nameplateBtn');
-  const vMenu = document.getElementById('variantMenu');
-  if (npBtn && vMenu) {
-    npBtn.addEventListener('click', () => { vMenu.hidden = !vMenu.hidden; });
-    vMenu.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
-      vMenu.hidden = true;
-      const [n, t] = b.dataset.v.split('|');
-      const v = WC4_GENERALS.find((x) => x.name === n && x.tier === t);
-      if (v) {
-        if (v.tier !== tier && tier !== 'all') applyTier(v.tier);
-        genSearch.value = v.name;
-        genSelect.value = v.name + '|' + v.tier;
-        render(v);
-      }
-    }));
-  }
+  renderTierBtns(g);
   setStatus('ready', 'RECORD FOUND');
 }
 function syncSelect() {
-  const list = tier === 'all' ? WC4_GENERALS : WC4_GENERALS.filter((g) => g.tier === tier);
-  genSelect.innerHTML = list.map((g) => `<option value="${escapeHtml(g.name)}|${g.tier}">${escapeHtml(g.name)}</option>`).join('');
+  const list = canonicalList();
+  genSelect.innerHTML = list.map((g) => `<option value="${escapeHtml(g.name)}|${g.tier}">${escapeHtml(baseName(g.name))}</option>`).join('');
   const g = list[0];
-  if (g) { genSearch.value = g.name; updateClear(); render(g); }
+  if (g) { genSearch.value = baseName(g.name); updateClear(); render(g); }
 }
 function applyTier(t) {
   tier = t;
@@ -182,23 +205,26 @@ function applyTier(t) {
 }
 function filtered() {
   const q = genSearch.value.trim().toLowerCase();
-  return WC4_GENERALS.filter((g) => (tier === 'all' || g.tier === tier) && (!q || g.name.toLowerCase().includes(q)));
+  return canonicalList().filter((g) => !q || baseName(g.name).toLowerCase().includes(q) || g.name.toLowerCase().includes(q));
 }
 function refreshList() {
   matches = filtered();
   if (activeIdx > matches.length - 1) activeIdx = -1;
-  genSearchList.innerHTML = matches.slice(0, 60).map((g, i) =>
-    `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(g.name)}<small>&nbsp;· ${escapeHtml(g.tier)}</small></li>`).join('');
+  genSearchList.innerHTML = matches.slice(0, 60).map((g, i) => {
+    const b = baseName(g.name);
+    const n = (VARIANTS[b] || []).length;
+    const multi = g.hasVariants === true || n > 1;
+    return `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(b)}<small>&nbsp;· ${escapeHtml(capTier(g.tier))}${multi ? ' · ' + n + ' colors' : ''}</small></li>`;
+  }).join('');
   genSearchList.querySelectorAll('.combo__item').forEach((el) =>
     el.addEventListener('mousedown', (e) => { e.preventDefault(); pick(Number(el.dataset.i)); }));
 }
 function pick(i) {
   const g = matches[i];
   if (!g) return;
-  genSearch.value = g.name;
+  genSearch.value = baseName(g.name);
   updateClear();
   genSearchList.hidden = true;
-  if (g.tier !== tier && tier !== 'all') applyTier(g.tier);
   genSelect.value = g.name + '|' + g.tier;
   render(g);
 }
@@ -226,13 +252,6 @@ genSearch.addEventListener('keydown', (e) => {
 });
 genSearch.addEventListener('blur', () => { genSearchList.hidden = true; });
 genClear.addEventListener('click', () => { genSearch.value = ''; updateClear(); refreshList(); genSearch.focus(); });
-document.addEventListener('click', (e) => {
-  const m = document.getElementById('variantMenu');
-  if (m && !m.hidden && !e.target.closest('#variantMenu') && !e.target.closest('#nameplateBtn')) m.hidden = true;
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { const m = document.getElementById('variantMenu'); if (m) m.hidden = true; }
-});
 setStatus('busy', 'LOADING');
 syncSelect();
 refreshList();

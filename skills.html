@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
-<link rel="stylesheet" href="css/app.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=24">
+<link rel="stylesheet" href="css/app.css?v=24">
 </head>
 <body>
 <header class="topbar">
@@ -89,11 +89,11 @@
   <p>Contributors: JVrylle • Special thanks to Nuclearman and Styx</p>
   <p>Unofficial fan-made project — not affiliated with EasyTech, the developer of World Conqueror 4.</p>
 </footer>
-<script src="js/data_skills.js?v=21"></script>
-<script src="js/data_skill_icons.js?v=21"></script>
-<script src="js/data_feat_icons.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
-<script src="js/support.js?v=21"></script>
+<script src="js/data_skills.js?v=24"></script>
+<script src="js/data_skill_icons.js?v=24"></script>
+<script src="js/data_feat_icons.js?v=24"></script>
+<script src="js/app.js?v=24"></script>
+<script src="js/support.js?v=24"></script>
 <script>
 const TIER_ORDER = ['bronze', 'silver', 'gold', 'platinum'];
 const items = [
@@ -158,7 +158,7 @@ function setStep(n) {
   document.getElementById('levelField').hidden = max <= 1;
   if (current) render(current, n);
 }
-function kindList() { return items.filter((s) => kind === 'all' || s.kind === kind); }
+function kindList() { return items.filter((s) => kind === 'all' || s.kind === kind).sort((a, b) => a.title.localeCompare(b.title)); }
 function fillTypeSelect() {
   const list = kindList();
   skType.innerHTML = list.map((s, i) => `<option value="${i}">${escapeHtml(s.title)}</option>`).join('');
@@ -174,7 +174,7 @@ function syncKind(k, renderFirst = true) {
 }
 function filtered() {
   const q = skSearch.value.trim().toLowerCase();
-  return items.filter((s) => (kind === 'all' || s.kind === kind) && (!q || s._q.includes(q)));
+  return items.filter((s) => (kind === 'all' || s.kind === kind) && (!q || s._q.includes(q))).sort((a, b) => a.title.localeCompare(b.title));
 }
 function refreshList() {
   matches = filtered();

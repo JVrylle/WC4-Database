@@ -14,6 +14,13 @@ const TIER_LABELS = {
   orange: "Orange",
 };
 
+// Strip the " (Tier)" suffix: "Bock (Gold)" -> "Bock". Base + tier uniquely
+// identifies a record; generals with several colors show as one entry and
+// carry `hasVariants` in the data file.
+function calcBaseName(n) {
+  return (n || "").replace(/\s*\((Bronze|Gold|Silver|Purple|Orange|Trained)\)\s*/g, "").trim() || n;
+}
+
 const TYPE_ORDER = ["infantry", "artillery", "navy", "armored", "airforce"];
 
 const TYPE_LABELS = {
@@ -102,8 +109,11 @@ const FORMULA_INPUTS = [
 
 const DEFAULT_SKILL_MAX = 5;
 const GEN_ADD_SLOTS = 2;
+const MAX_GENERAL_SKILLS = 5;
 
 let ALL_GENERALS = [];
+const GENERAL_VARIANTS = {}; // base name -> records, TIER_ORDER sorted
+let GENERAL_CANON = []; // [{ base, row }] one resolved record per general
 let ALL_UNITS = [];
 let GENERAL_SKILLS = {};
 let EF_SKILLS = [];
@@ -141,6 +151,7 @@ const compareBtn = document.getElementById("compareBtn");
 const sideEls = {
   left: {
     genSelect: document.getElementById("leftGenSelect"),
+    tierBtns: document.getElementById("leftTierBtns"),
     efSelect: document.getElementById("leftEfSelect"),
     levelSlider: document.getElementById("leftLevelSlider"),
     levelInput: document.getElementById("leftLevelInput"),
@@ -156,6 +167,7 @@ const sideEls = {
   },
   right: {
     genSelect: document.getElementById("rightGenSelect"),
+    tierBtns: document.getElementById("rightTierBtns"),
     efSelect: document.getElementById("rightEfSelect"),
     levelSlider: document.getElementById("rightLevelSlider"),
     levelInput: document.getElementById("rightLevelInput"),
@@ -227,7 +239,9 @@ async function fetchJson(url) {
 function populateSelect(select, entries, groups, labels, itemTier) {
   select.innerHTML = "";
   for (const group of groups) {
-    const list = entries.filter((item) => itemTier(item) === group);
+    const list = entries
+      .filter((item) => itemTier(item) === group)
+      .sort((a, b) => String(a.name).localeCompare(String(b.name)));
     if (list.length === 0) continue;
     const optgroup = document.createElement("optgroup");
     optgroup.label = labels[group] || group;
@@ -243,6 +257,68 @@ function populateSelect(select, entries, groups, labels, itemTier) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+// Group generals by base name (one entry per general) and populate the
+// General dropdowns with the canonical list. Tier buttons beside each
+// dropdown switch the color variant of the selected general.
+function buildGeneralVariants() {
+  for (const g of ALL_GENERALS) {
+    const b = calcBaseName(g.name);
+    (GENERAL_VARIANTS[b] = GENERAL_VARIANTS[b] || []).push(g);
+  }
+  for (const list of Object.values(GENERAL_VARIANTS)) {
+    list.sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
+  }
+  GENERAL_CANON = Object.keys(GENERAL_VARIANTS)
+    .sort((a, b) => a.localeCompare(b))
+    .map((b) => ({ base: b, row: GENERAL_VARIANTS[b][0] }));
+}
+
+function populateGeneralSelect(select) {
+  select.innerHTML = "";
+  const optgroup = document.createElement("optgroup");
+  optgroup.label = "Generals";
+  for (const c of GENERAL_CANON) {
+    const opt = document.createElement("option");
+    opt.value = `${c.row.tier}|${c.row.id}`;
+    opt.textContent = c.base;
+    optgroup.appendChild(opt);
+  }
+  select.appendChild(optgroup);
+}
+
+function selectedGeneralRow(select) {
+  const sel = parseSelection(select);
+  if (!sel) return null;
+  return ALL_GENERALS.find((x) => x.id === sel.id && x.tier === sel.group) || null;
+}
+
+function renderGenTierBtns(side) {
+  const els = sideEls[side];
+  const box = els.tierBtns;
+  if (!box) return;
+  const row = selectedGeneralRow(els.genSelect);
+  if (!row) { box.innerHTML = ""; box.hidden = true; return; }
+  const list = GENERAL_VARIANTS[calcBaseName(row.name)] || [row];
+  const multi = row.full && row.full.hasVariants === true ? true : list.length > 1;
+  if (!multi) { box.innerHTML = ""; box.hidden = true; return; }
+  box.hidden = false;
+  box.innerHTML = "";
+  for (const v of list) {
+    const on = v.tier === row.tier && v.id === row.id;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tier-btn" + (on ? " tier-btn--on" : "");
+    btn.dataset.t = v.tier;
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.textContent = TIER_LABELS[v.tier] || v.tier;
+    btn.addEventListener("click", () => {
+      els.genSelect.value = `${v.tier}|${v.id}`;
+      renderGenTierBtns(side);
+    });
+    box.appendChild(btn);
+  }
 }
 
 function clampLevel(value) {
@@ -789,7 +865,7 @@ function renderGeneralSkillColumn(side) {
     html += renderLevelStepper("genLevel", side, sk.title, cur, max, "");
     html += `</div>`;
   }
-  for (let i = 0; i < GEN_ADD_SLOTS; i++) {
+  for (let i = 0; i < Math.min(GEN_ADD_SLOTS, Math.max(0, MAX_GENERAL_SKILLS - s.dbGenSkills.length)); i++) {
     const add = s.genAdditions[i];
     if (add) {
       const max = skillMaxLevel(add.title);
@@ -1067,6 +1143,7 @@ resultPanel.addEventListener("change", (event) => {
 
   if (sel.dataset.add === "genSkill") {
     if (s.genAdditions.length >= GEN_ADD_SLOTS) return;
+    if (s.dbGenSkills.length + s.genAdditions.length >= MAX_GENERAL_SKILLS) return;
     s.genAdditions.push({ title: sel.value, level: 1 });
   }
 
@@ -1312,20 +1389,13 @@ async function init() {
       throw new Error("One of the databases has no entries.");
     }
 
-    populateSelect(
-      sideEls.left.genSelect,
-      ALL_GENERALS,
-      TIER_ORDER,
-      TIER_LABELS,
-      (g) => g.tier || "bronze"
-    );
-    populateSelect(
-      sideEls.right.genSelect,
-      ALL_GENERALS,
-      TIER_ORDER,
-      TIER_LABELS,
-      (g) => g.tier || "bronze"
-    );
+    buildGeneralVariants();
+    populateGeneralSelect(sideEls.left.genSelect);
+    populateGeneralSelect(sideEls.right.genSelect);
+    for (const side of ["left", "right"]) {
+      renderGenTierBtns(side);
+      sideEls[side].genSelect.addEventListener("change", () => renderGenTierBtns(side));
+    }
     populateSelect(
       sideEls.left.efSelect,
       ALL_UNITS,

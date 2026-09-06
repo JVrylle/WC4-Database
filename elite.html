@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
-<link rel="stylesheet" href="css/app.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=24">
+<link rel="stylesheet" href="css/app.css?v=24">
 </head>
 <body>
 <header class="topbar">
@@ -91,11 +91,11 @@
   <p>Contributors: JVrylle • Special thanks to Nuclearman and Styx</p>
   <p>Unofficial fan-made project — not affiliated with EasyTech, the developer of World Conqueror 4.</p>
 </footer>
-<script src="js/data_eliteforce.js?v=21"></script>
-<script src="js/data_feat_icons.js?v=21"></script>
-<script src="js/data_portraits.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
-<script src="js/support.js?v=21"></script>
+<script src="js/data_eliteforce.js?v=24"></script>
+<script src="js/data_feat_icons.js?v=24"></script>
+<script src="js/data_portraits.js?v=24"></script>
+<script src="js/app.js?v=24"></script>
+<script src="js/support.js?v=24"></script>
 <script>
 const UNIT_TYPES = ['infantry', 'artillery', 'navy', 'armored', 'airforce'];
 const TYPE_LABELS = { infantry: 'Infantry', artillery: 'Artillery', navy: 'Navy', armored: 'Armored', airforce: 'Air Force' };
@@ -199,7 +199,7 @@ function setLevel(n) {
 }
 function refreshMatches() {
   const q = efSearch.value.trim().toLowerCase();
-  matches = WC4_ELITE.filter((u) => (!q || u.name.toLowerCase().includes(q)));
+  matches = WC4_ELITE.filter((u) => (!q || u.name.toLowerCase().includes(q))).sort((a, b) => a.name.localeCompare(b.name));
   if (activeIdx > matches.length - 1) activeIdx = -1;
   efSearchList.innerHTML = matches.slice(0, 60).map((u, i) =>
     `<li role="option" class="combo__item${i === activeIdx ? ' combo__item--active' : ''}" data-i="${i}">${escapeHtml(u.name)}</li>`).join('');
@@ -218,7 +218,7 @@ function pick(i) {
 function applyType(t) {
   selectedType = t;
   document.querySelectorAll('#typeFilter .type-btn').forEach((b) => b.classList.toggle('type-btn--active', b.dataset.type === t));
-  const list = WC4_ELITE.filter((u) => normType(u.unit_type) === t);
+  const list = WC4_ELITE.filter((u) => normType(u.unit_type) === t).sort((a, b) => a.name.localeCompare(b.name));
   efSelect.innerHTML = list.map((u) => `<option value="${escapeHtml(u.name)}">${escapeHtml(u.name)}</option>`).join('');
   const u = list[0];
   if (u) { efSearch.value = u.name; render(u, curLevel()); }
